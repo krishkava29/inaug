@@ -11,7 +11,7 @@ import gsap from "gsap";
 import type { AudioEngine } from "@/lib/audio-engine";
 import type { ParticleBurstHandle } from "./ParticleBurst";
 import departmentEmblem from "@/assets/department-emblem.png";
-import collegeCrest from "@/assets/college-crest.png";
+import collegeCrest from "@/assets/ggsplogo.png";
 import { Sparkles, GraduationCap, UserCheck, Users, ChevronRight, RotateCcw } from "lucide-react";
 
 interface Props {
