@@ -11,8 +11,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import type { AudioEngine } from "@/lib/audio-engine";
 import type { ParticleBurstHandle } from "./ParticleBurst";
-import departmentEmblem from "@/assets/department-emblem.png";
-import collegeCrest from "@/assets/college-crest.png";
+import ggspLogo from "@/assets/ggsplogo.png";
 import { Sparkles, GraduationCap, UserCheck, Users, Gamepad2, Code2, Cpu, ChevronRight, RotateCcw, Lock } from "lucide-react";
 
 interface Props {
@@ -67,16 +66,21 @@ const WELCOME_CARDS = [
       "Extending our heartfelt gratitude and warmest welcome to our Honorable Principal. Thank you for empowering our institution with visionary leadership and fostering a culture of technical excellence.",
   },
   {
-    id: "hod",
-    title: "Respected Head of Department",
-    subtitle: "Department of AI & ML",
-    role: "Academic & Technical Direction",
+    id: "hods_and_dignitaries",
+    title: "Respected HODs & Dignitaries",
+    subtitle: "Department Heads · TPO · Registrar · Skill Coordinator",
+    role: "Institutional Guidance & Leadership",
     icon: UserCheck,
-    image: "/hod.jpg",
     badgeColor: "bg-cyan-500/10 text-cyan-400 border-cyan-500/30",
     glowColor: "rgba(6, 182, 212, 0.25)",
     message:
-      "A warm welcome to our Head of Department. Under your inspiring guidance, the Department of AI & ML launches this Skill Development Program to shape tomorrow's tech leaders.",
+      "Extending our heartfelt gratitude and warmest welcome to all Respected HODs, TPO Sir, Registrar Sir, and Skill Development Coordinator. Thank you for your unwavering support, guidance, and encouragement in organizing this Skill Development Program.",
+    tags: [
+      "All Respected HODs",
+      "TPO Sir",
+      "Registrar Sir",
+      "Skill Development Coordinator",
+    ],
   },
   {
     id: "students",
@@ -226,38 +230,43 @@ export function FinalReveal({ audio, burstRef }: Props) {
         <div className="flex w-full flex-col items-center justify-center">
           <div className="reveal-flash pointer-events-none fixed inset-0 z-30 bg-primary/70 mix-blend-screen" />
 
-          {/* Emblem */}
-          <div className="relative mb-8 flex h-[240px] w-[240px] items-center justify-center md:h-[280px] md:w-[280px]">
+          {/* GGSP Logo — Centre Emblem */}
+          <div className="relative mb-8 flex h-[280px] w-[280px] items-center justify-center md:h-[340px] md:w-[340px]">
+            {/* Slow-rotating rings */}
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="reveal-ring absolute rounded-full border border-primary/25"
+                className="reveal-ring absolute rounded-full"
                 style={{
-                  inset: `${-i * 24}px`,
-                  animation: `spin ${26 + i * 14}s linear infinite ${i % 2 ? "reverse" : "normal"}`,
-                  borderStyle: i === 1 ? "dashed" : "solid",
+                  inset: `${-i * 26}px`,
+                  border: `1px ${i === 1 ? "dashed" : "solid"} rgba(90,180,255,${0.18 - i * 0.04})`,
+                  animation: `spin ${28 + i * 16}s linear infinite ${i % 2 ? "reverse" : "normal"}`,
                 }}
               />
             ))}
+            {/* Deep void backing */}
             <div
-              className="absolute inset-6 rounded-full"
-              style={{ background: "var(--gradient-void)", boxShadow: "var(--shadow-deep)" }}
+              className="absolute inset-0 rounded-full"
+              style={{ background: "radial-gradient(circle, rgba(6,18,48,0.85) 0%, transparent 80%)" }}
             />
+            {/* Coloured halo glow */}
+            <div className="absolute inset-8 rounded-full opacity-40 blur-2xl" style={{ background: "radial-gradient(circle, rgba(59,130,246,0.6) 0%, rgba(6,182,212,0.3) 60%, transparent 100%)" }} />
+            {/* Logo */}
             <img
-              src={departmentEmblem}
-              alt="Department Emblem"
-              className="reveal-emblem relative h-[190px] w-[190px] object-contain md:h-[230px] md:w-[230px]"
-              style={{ filter: "drop-shadow(0 0 46px rgba(90,180,255,0.55))" }}
+              src={ggspLogo}
+              alt="Guru Gobind Singh Polytechnic, Nashik"
+              className="reveal-emblem relative z-10 h-[220px] w-[220px] object-contain md:h-[270px] md:w-[270px]"
+              style={{ filter: "drop-shadow(0 0 32px rgba(59,130,246,0.55)) drop-shadow(0 0 8px rgba(255,255,255,0.25))" }}
               loading="eager"
             />
           </div>
 
           {/* Wordmark */}
           <h1 className="font-display leading-[1.05] tracking-[0.12em] uppercase">
-            <span className="reveal-line block text-sm text-muted-foreground md:text-base">
-              Department of
+            <span className="reveal-line block text-sm font-semibold text-muted-foreground md:text-base tracking-[0.3em]">
+              Guru Gobind Singh Polytechnic, Nashik
             </span>
-            <span className="reveal-line text-energy-gradient mt-2 block text-4xl font-black md:text-6xl lg:text-7xl">
+            <span className="reveal-line text-energy-gradient mt-3 block text-4xl font-black md:text-6xl lg:text-7xl">
               Artificial Intelligence
             </span>
             <span className="reveal-line my-1 block text-2xl text-primary/70 md:text-3xl">&amp;</span>
@@ -270,22 +279,10 @@ export function FinalReveal({ audio, burstRef }: Props) {
             Empowering the Future Through Intelligence
           </p>
 
-          {/* College Crest */}
-          <div className="reveal-crest mt-8 flex items-center gap-4">
-            <img
-              src={collegeCrest}
-              alt="College Crest"
-              className="h-14 w-14 object-contain opacity-90 md:h-18 md:w-18"
-              loading="lazy"
-            />
-            <div className="text-left">
-              <p className="font-display text-[11px] tracking-[0.3em] text-foreground uppercase font-bold">
-                Guru Gobind Singh Polytechnic, Nashik
-              </p>
-              <p className="font-mono text-[10px] tracking-[0.22em] text-muted-foreground uppercase">
-                Inauguration Ceremony · Skill Development Program
-              </p>
-            </div>
+          {/* Ceremony sub-label */}
+          <div className="reveal-crest mt-6 inline-flex items-center gap-2.5 rounded-full border border-primary/30 bg-primary/10 px-5 py-2 font-mono text-[11px] tracking-[0.28em] text-primary/80 uppercase">
+            <Sparkles className="h-3.5 w-3.5 text-cyan-400" />
+            <span>Inauguration Ceremony · Skill Development Program</span>
           </div>
         </div>
       )}
@@ -508,6 +505,19 @@ export function FinalReveal({ audio, burstRef }: Props) {
                       <p className="mt-1 font-mono text-sm tracking-wider text-primary/80 font-semibold uppercase md:text-base">
                         {card.subtitle}
                       </p>
+                      {"tags" in card && Array.isArray(card.tags) && (
+                        <div className="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
+                          {card.tags.map((tag: string) => (
+                            <span
+                              key={tag}
+                              className="inline-flex items-center gap-1.5 rounded-xl border border-cyan-400/40 bg-cyan-500/10 px-3 py-1 font-mono text-xs font-semibold text-cyan-300 tracking-wide uppercase shadow-[0_0_15px_rgba(6,182,212,0.15)]"
+                            >
+                              <Sparkles className="h-3 w-3 text-cyan-400" />
+                              <span>{tag}</span>
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
