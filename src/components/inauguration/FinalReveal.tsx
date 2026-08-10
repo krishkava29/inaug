@@ -1,25 +1,26 @@
 /**
  * FinalReveal.tsx
  * ---------------------------------------------------------------------------
- * The payoff:
+ * The payoff narrative sequence:
  * 1. Initial Department Emblem & Inauguration Unveiling
  * 2. Kinetic Word Sequence: CREATE ➔ BUILD ➔ EXPLORE ➔ IMMERSE
- * 3. Warm Welcome Ceremony for Principal, HOD, and Students
+ * 3. Unity Ignite Program Inauguration Card ("From Gamer to Game Development")
+ * 4. Warm Welcome Ceremony for Principal, HOD, and Students (Final Static Display)
  */
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import type { AudioEngine } from "@/lib/audio-engine";
 import type { ParticleBurstHandle } from "./ParticleBurst";
 import departmentEmblem from "@/assets/department-emblem.png";
-import collegeCrest from "@/assets/ggsplogo.png";
-import { Sparkles, GraduationCap, UserCheck, Users, ChevronRight, RotateCcw } from "lucide-react";
+import collegeCrest from "@/assets/college-crest.png";
+import { Sparkles, GraduationCap, UserCheck, Users, Gamepad2, Code2, Cpu, ChevronRight, RotateCcw, Lock } from "lucide-react";
 
 interface Props {
   audio: AudioEngine;
   burstRef: React.RefObject<ParticleBurstHandle | null>;
 }
 
-type RevealPhase = "hero" | "words" | "welcome";
+type RevealPhase = "hero" | "words" | "program_card" | "welcome";
 
 const WORD_SEQUENCE = [
   {
@@ -93,8 +94,9 @@ export function FinalReveal({ audio, burstRef }: Props) {
   const [phase, setPhase] = useState<RevealPhase>("hero");
   const [activeWordIndex, setActiveWordIndex] = useState(0);
   const [activeWelcomeTab, setActiveWelcomeTab] = useState<number>(0);
+  const [isStaticLocked, setIsStaticLocked] = useState(false);
 
-  /* ------------------------------------------------------------- Hero Phase */
+  /* ------------------------------------------------------------- 1. Hero Phase */
   useEffect(() => {
     if (phase !== "hero") return;
     audio.setAmbience("reveal");
@@ -150,7 +152,7 @@ export function FinalReveal({ audio, burstRef }: Props) {
         2.4,
       );
 
-      // Auto transition to CREATE -> BUILD -> EXPLORE -> IMMERSE sequence as part of the reveal flow
+      // Auto transition to CREATE -> BUILD -> EXPLORE -> IMMERSE sequence
       tl.call(
         () => {
           setActiveWordIndex(0);
@@ -164,7 +166,7 @@ export function FinalReveal({ audio, burstRef }: Props) {
     return () => ctx.revert();
   }, [phase, audio, burstRef]);
 
-  /* ------------------------------------------- Word Sequence Auto Transition */
+  /* ------------------------------------------- 2. Word Sequence Auto Transition */
   useEffect(() => {
     if (phase !== "words") return;
 
@@ -177,26 +179,40 @@ export function FinalReveal({ audio, burstRef }: Props) {
       if (activeWordIndex < WORD_SEQUENCE.length - 1) {
         setActiveWordIndex((prev) => prev + 1);
       } else {
-        setPhase("welcome");
+        setPhase("program_card");
       }
     }, 2400);
 
     return () => clearTimeout(timer);
   }, [phase, activeWordIndex, audio, burstRef]);
 
-  /* ------------------------------------------- Welcome Stage Sound Effect */
+  /* ------------------------------------------- 3. Program Inauguration Card Phase */
+  useEffect(() => {
+    if (phase !== "program_card") return;
+
+    audio.riser(2.5);
+    burstRef.current?.burst({ count: 450, power: 1.3 });
+    audio.speak("Inauguration of Unity Ignite: From Gamer to Game Development. A Skill Development Program.");
+
+    // If sequence has already completed once (statically locked), DO NOT auto-advance!
+    if (isStaticLocked) return;
+
+    const timer = setTimeout(() => {
+      setPhase("welcome");
+    }, 5500);
+
+    return () => clearTimeout(timer);
+  }, [phase, audio, burstRef, isStaticLocked]);
+
+  /* ------------------------------------------- 4. Welcome Stage & Static Lock */
   useEffect(() => {
     if (phase === "welcome") {
       audio.riser(2.0);
       audio.speak("Warm welcome to our Principal, Head of Department, and Students.");
       burstRef.current?.burst({ count: 350, power: 1.1 });
+      setIsStaticLocked(true);
     }
   }, [phase, audio, burstRef]);
-
-  const startWordSequence = () => {
-    setActiveWordIndex(0);
-    setPhase("words");
-  };
 
   return (
     <div
@@ -311,9 +327,77 @@ export function FinalReveal({ audio, burstRef }: Props) {
         </div>
       )}
 
-      {/* -------------------------------------------------- 3. WELCOME PHASE */}
+      {/* ------------------------------- 3. PROGRAM INAUGURATION BIG CARD */}
+      {phase === "program_card" && (
+        <div className="animate-in fade-in zoom-in-95 duration-700 flex w-full max-w-4xl flex-col items-center justify-center px-4 py-6">
+          <div className="relative w-full overflow-hidden rounded-3xl border border-primary/40 bg-card/70 p-8 text-center backdrop-blur-xl shadow-[0_0_80px_rgba(90,180,255,0.25)] md:p-12">
+            
+            {/* Top Accent Ribbon */}
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-500/10 px-5 py-1.5 font-mono text-xs tracking-[0.3em] text-cyan-300 uppercase">
+              <Sparkles className="h-4 w-4 text-cyan-400" />
+              <span>OFFICIAL INAUGURATION ANNOUNCEMENT</span>
+            </div>
+
+            <p className="font-mono text-xs tracking-[0.35em] text-primary/80 uppercase">
+              INAUGURATION OF
+            </p>
+
+            {/* Main Program Title */}
+            <div className="my-6">
+              <h2 className="bg-gradient-to-r from-cyan-300 via-blue-400 to-indigo-300 bg-clip-text text-4xl font-black tracking-wider text-transparent md:text-6xl lg:text-7xl uppercase drop-shadow-[0_0_35px_rgba(90,180,255,0.5)]">
+                UNITY IGNITE
+              </h2>
+              <div className="mt-3 inline-flex items-center gap-3 rounded-2xl border border-primary/30 bg-primary/15 px-6 py-2">
+                <Gamepad2 className="h-5 w-5 text-cyan-400" />
+                <span className="font-display text-lg font-extrabold tracking-widest text-foreground md:text-2xl uppercase">
+                  "From Gamer to Game Development"
+                </span>
+                <Code2 className="h-5 w-5 text-cyan-400" />
+              </div>
+            </div>
+
+            {/* Program Type Badge */}
+            <div className="my-6 inline-block rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-6 py-2 font-mono text-xs tracking-[0.25em] text-emerald-400 uppercase font-semibold">
+              A SKILL DEVELOPMENT PROGRAM
+            </div>
+
+            {/* Organizer Info */}
+            <div className="mt-6 border-t border-border/50 pt-6">
+              <p className="font-mono text-xs tracking-[0.25em] text-muted-foreground uppercase">
+                ORGANIZED BY
+              </p>
+              <h3 className="mt-1 font-display text-xl font-bold tracking-wide text-foreground md:text-2xl uppercase">
+                Department of Artificial Intelligence &amp; Machine Learning
+              </h3>
+              <p className="mt-1 font-mono text-xs tracking-[0.2em] text-primary/80 uppercase font-medium">
+                Guru Gobind Singh Polytechnic, Nashik
+              </p>
+            </div>
+
+            <button
+              onClick={() => setPhase("welcome")}
+              className="mt-8 inline-flex items-center gap-2 rounded-full border border-primary/40 bg-primary/20 px-6 py-2.5 font-mono text-xs tracking-wider text-primary hover:bg-primary/30 uppercase transition-all"
+            >
+              <span>Continue to Welcome Honors</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+
+          </div>
+        </div>
+      )}
+
+      {/* ---------------------------------- 4. WELCOME PHASE & STATIC DISPLAY */}
       {phase === "welcome" && (
         <div className="animate-in fade-in duration-700 flex w-full max-w-5xl flex-col items-center justify-center py-6">
+          
+          {/* Static Presentation Lock Badge */}
+          {isStaticLocked && (
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-4 py-1 font-mono text-[10px] tracking-[0.25em] text-emerald-400 uppercase">
+              <Lock className="h-3 w-3 text-emerald-400" />
+              <span>STATIC PRESENTATION DISPLAY LOCK</span>
+            </div>
+          )}
+
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1 font-mono text-[11px] tracking-[0.3em] text-primary uppercase">
             <Sparkles className="h-3.5 w-3.5" />
             <span>Guru Gobind Singh Polytechnic, Nashik</span>
@@ -400,13 +484,13 @@ export function FinalReveal({ audio, burstRef }: Props) {
               className="flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-5 py-2 font-mono text-xs tracking-wider text-primary hover:bg-primary/20 uppercase"
             >
               <RotateCcw className="h-3.5 w-3.5" />
-              <span>Replay CREATE Sequence</span>
+              <span>Replay Sequence</span>
             </button>
             <button
-              onClick={() => setPhase("hero")}
+              onClick={() => setPhase("program_card")}
               className="flex items-center gap-2 rounded-lg border border-border bg-background/50 px-5 py-2 font-mono text-xs tracking-wider text-muted-foreground hover:text-foreground uppercase"
             >
-              <span>Back to Unveil</span>
+              <span>View Program Card</span>
             </button>
           </div>
         </div>
@@ -422,9 +506,10 @@ export function FinalReveal({ audio, burstRef }: Props) {
           Guru Gobind Singh Polytechnic · AI &amp; ML
         </span>
         <span className="absolute right-20 bottom-1 font-mono text-[10px] tracking-[0.3em] text-primary/60 uppercase">
-          Skill Development Program · MMXXVI
+          Skill Development Program · Unity Ignite
         </span>
       </div>
     </div>
   );
 }
+
